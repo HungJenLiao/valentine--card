@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Will You Be My Valentine? 💕</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: radial-gradient(ellipse at top, #2d0030 0%, #1a000f 40%, #0d0008 100%);
+      min-height: 100vh;
+      overflow: hidden;
+      font-family: 'Lato', sans-serif;
+    }
+
+    /* ── Floating hearts ── */
+    @keyframes floatUp {
+      0%   { transform: translateY(110vh) rotate(-10deg) scale(0.6); opacity: 0; }
+      8%   { opacity: 0.9; }
+      92%  { opacity: 0.9; }
+      100% { transform: translateY(-12vh) rotate(15deg) scale(1.1); opacity: 0; }
+    }
+    .fheart {
+      position: fixed;
+      pointer-events: none;
+      animation: floatUp linear infinite;
+      user-select: none;
+      z-index: 0;
+    }
+
+    /* ── Card glow ── */
+    @keyframes cardPulse {
+      0%, 100% { box-shadow: 0 0 50px rgba(255,80,120,0.20), 0 0 120px rgba(180,0,60,0.10), inset 0 0 40px rgba(255,100,140,0.04); }
+      50%       { box-shadow: 0 0 80px rgba(255,80,120,0.45), 0 0 200px rgba(200,0,80,0.25), inset 0 0 60px rgba(255,100,140,0.08); }
+    }
+    .card {
+      background: linear-gradient(160deg, rgba(255,255,255,0.07) 0%, rgba(255,100,140,0.04) 100%);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255,120,160,0.35);
+      border-radius: 36px;
+      padding: 64px 56px 56px;
+      text-align: center;
+      max-width: 520px;
+      width: 90vw;
+      position: relative;
+      z-index: 2;
+      animation: cardPulse 3.5s ease-in-out infinite;
+    }
+
+    /* ── Text glow ── */
+    @keyframes textGlow {
+      0%, 100% { text-shadow: 0 0 18px rgba(255,130,180,0.55), 0 2px 8px rgba(0,0,0,0.5); }
+      50%       { text-shadow: 0 0 40px rgba(255,80,150,1.0), 0 0 70px rgba(220,0,100,0.5), 0 2px 8px rgba(0,0,0,0.5); }
+    }
+    .main-title {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(1.9rem, 4.5vw, 2.9rem);
+      color: #fff;
+      line-height: 1.45;
+      margin-bottom: 10px;
+      animation: textGlow 2.5s ease-in-out infinite;
+    }
+    .subtitle {
+      font-family: 'Lato', sans-serif;
+      font-weight: 300;
+      font-size: 0.88rem;
+      color: rgba(255,200,220,0.65);
+      letter-spacing: 0.12em;
+      margin-bottom: 44px;
+    }
+
+    /* ── Icon heart ── */
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      20%       { transform: scale(1.18); }
+      40%       { transform: scale(1); }
+      60%       { transform: scale(1.08); }
+    }
+    .icon-heart {
+      display: inline-block;
+      font-size: 3rem;
+      margin-bottom: 22px;
+      animation: heartbeat 1.6s ease-in-out infinite;
+    }
+
+    /* ── Yes button ── */
+    .btn-yes {
+      background: linear-gradient(135deg, #ff4d6d 0%, #c9184a 100%);
+      color: #fff;
+      border: none;
+      padding: 15px 60px;
+      border-radius: 50px;
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.65rem;
+      cursor: pointer;
+      transition: transform 0.18s, box-shadow 0.18s;
+      box-shadow: 0 5px 22px rgba(255,77,109,0.5);
+      letter-spacing: 0.04em;
+    }
+    .btn-yes:hover {
+      transform: scale(1.1);
+      box-shadow: 0 8px 38px rgba(255,77,109,0.75);
+    }
+    .btn-yes:active { transform: scale(0.96); }
+
+    /* ── No button (fixed, runs away) ── */
+    .btn-no {
+      background: rgba(60,60,60,0.45);
+      color: rgba(180,180,180,0.65);
+      border: 1px solid rgba(120,120,120,0.3);
+      padding: 15px 60px;
+      border-radius: 50px;
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.65rem;
+      cursor: not-allowed;
+      position: fixed;
+      user-select: none;
+      white-space: nowrap;
+      pointer-events: auto;
+      z-index: 10;
+    }
+
+    /* ── Happy Valentine page ── */
+    @keyframes fadeInScale {
+      from { opacity: 0; transform: scale(0.88) translateY(20px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    @keyframes bigHeartbeat {
+      0%, 100% { transform: scale(1); }
+      25%       { transform: scale(1.2); }
+      50%       { transform: scale(1); }
+      75%       { transform: scale(1.1); }
+    }
+    .happy-card {
+      animation: fadeInScale 0.85s cubic-bezier(0.22,1,0.36,1) forwards;
+    }
+    .happy-icon {
+      font-size: 5.5rem;
+      display: block;
+      margin-bottom: 28px;
+      animation: bigHeartbeat 1.5s ease-in-out infinite;
+    }
+    .happy-title {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      color: #fff;
+      animation: textGlow 2s ease-in-out infinite;
+      margin-bottom: 18px;
+    }
+    .happy-sub {
+      font-family: 'Lato', sans-serif;
+      font-weight: 300;
+      color: rgba(255,200,220,0.8);
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+    }
+    .happy-sub2 {
+      font-family: 'Lato', sans-serif;
+      font-weight: 300;
+      color: rgba(255,180,200,0.5);
+      font-size: 0.9rem;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      width: 60px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,120,160,0.6), transparent);
+      margin: 18px auto 22px;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef, useCallback } = React;
+
+    /* ─── Floating hearts background ─── */
+    const EMOJIS = ['💕','💖','💗','💓','❤️','💝','🌹','✨','💫','🌸'];
+
+    function FloatingHearts({ count = 18 }) {
+      const items = useRef(
+        Array.from({ length: count }, (_, i) => ({
+          id: i,
+          emoji: EMOJIS[Math.floor(Math.random() * EMOJIS.length)],
+          left: Math.random() * 100,
+          size: Math.random() * 16 + 11,
+          duration: Math.random() * 10 + 9,
+          delay: Math.random() * 9,
+        }))
+      );
+
+      return (
+        <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', overflow: 'hidden', zIndex: 0 }}>
+          {items.current.map(h => (
+            <span
+              key={h.id}
+              className="fheart"
+              style={{
+                left: `${h.left}%`,
+                bottom: '-60px',
+                fontSize: `${h.size}px`,
+                animationDuration: `${h.duration}s`,
+                animationDelay: `${h.delay}s`,
+              }}
+            >
+              {h.emoji}
+            </span>
+          ))}
+        </div>
+      );
+    }
+
+    /* ─── Happy Valentine page ─── */
+    function HappyPage() {
+      return (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '100vh',
+          position: 'relative',
+          zIndex: 1,
+        }}>
+          <FloatingHearts count={30} />
+          <div className="card happy-card">
+            <span className="happy-icon">💖</span>
+            <h1 className="happy-title">Happy Valentine's Day!</h1>
+            <div className="divider" />
+            <p className="happy-sub">You've made my heart so happy 🌹</p>
+            <p className="happy-sub2">Every moment with you is a treasure ✨</p>
+          </div>
+        </div>
+      );
+    }
+
+    /* ─── Main Valentine card ─── */
+    function ValentineCard() {
+      const [accepted, setAccepted] = useState(false);
+      const [noPos, setNoPos] = useState(null);
+      const noPosRef = useRef(null);
+      const noBtnRef = useRef(null);
+      const cardRef  = useRef(null);
+
+      /* Set initial No-button position next to the Yes button after mount */
+      useEffect(() => {
+        if (!cardRef.current) return;
+        const r = cardRef.current.getBoundingClientRect();
+        const init = {
+          x: r.left + r.width / 2 + 36,
+          y: r.bottom - 85,
+        };
+        setNoPos(init);
+        noPosRef.current = init;
+      }, []);
+
+      /* Mouse proximity → teleport No button */
+      const handleMouseMove = useCallback((e) => {
+        if (!noPosRef.current || !noBtnRef.current) return;
+        const pos = noPosRef.current;
+        const bw  = noBtnRef.current.offsetWidth  || 180;
+        const bh  = noBtnRef.current.offsetHeight || 55;
+
+        const cx = pos.x + bw / 2;
+        const cy = pos.y + bh / 2;
+        const dx = e.clientX - cx;
+        const dy = e.clientY - cy;
+
+        if (dx * dx + dy * dy < 180 * 180) {
+          const pad  = 24;
+          const maxX = window.innerWidth  - bw - pad;
+          const maxY = window.innerHeight - bh - pad;
+
+          /* Push away from current position, not just random */
+          const angle = Math.atan2(dy, dx) + Math.PI + (Math.random() - 0.5) * 1.2;
+          const dist  = 260 + Math.random() * 180;
+          let nx = pos.x + Math.cos(angle) * dist;
+          let ny = pos.y + Math.sin(angle) * dist;
+          nx = Math.max(pad, Math.min(maxX, nx));
+          ny = Math.max(pad, Math.min(maxY, ny));
+
+          const newPos = { x: nx, y: ny };
+          noPosRef.current = newPos;
+          setNoPos({ ...newPos });
+        }
+      }, []);
+
+      useEffect(() => {
+        window.addEventListener('mousemove', handleMouseMove);
+        return () => window.removeEventListener('mousemove', handleMouseMove);
+      }, [handleMouseMove]);
+
+      if (accepted) return <HappyPage />;
+
+      return (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: '100vh',
+            position: 'relative',
+            zIndex: 1,
+          }}
+        >
+          <FloatingHearts />
+
+          <div ref={cardRef} className="card">
+            <span className="icon-heart">💌</span>
+            <h1 className="main-title">Would you want to be my Valentine?</h1>
+            <p className="subtitle">— with all my heart 💕</p>
+
+            <button className="btn-yes" onClick={() => setAccepted(true)}>
+              Yes! 💖
+            </button>
+          </div>
+
+          {/* No button — floats freely and runs away */}
+          {noPos && (
+            <button
+              ref={noBtnRef}
+              className="btn-no"
+              style={{ left: noPos.x, top: noPos.y }}
+              onClick={e => e.preventDefault()}
+              onContextMenu={e => e.preventDefault()}
+              tabIndex={-1}
+            >
+              No 💔
+            </button>
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<ValentineCard />);
+  </script>
+</body>
+</html>
